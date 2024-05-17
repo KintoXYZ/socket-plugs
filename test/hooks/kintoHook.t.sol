@@ -8,6 +8,7 @@ import "../mocks/MockSocket.sol";
 import "../../contracts/hooks/KintoHook.sol";
 import "forge-std/console.sol";
 import "../../contracts/hooks/plugins/ExecutionHelper.sol";
+import "../../contracts/bridge/Base.sol";
 
 interface KintoID {
     function addSanction(address, uint16) external;
@@ -62,9 +63,9 @@ contract TestKintoHook is Test {
 
         _socket = address(uint160(_c++));
         controller__ = address(uint160(_c++));
-        kintoId__ = 0x4cA8415fda5Bd4EC9350Ede22eb8071f9970C7f2;
-        kintoFactory__ = 0xc16fBF31C98B15117208956D045B45153f1C9949;
-        kintoWallet__ = 0x96c83CA216Dbb29e1dB4C9122691D4610AF53f18;
+        kintoId__ = 0xCa41d9C3f13a8096356E6fddf0a29C51A938c410;
+        kintoFactory__ = 0xB8818F4c0CE119AC274f217e9C11506DCf1bBb70;
+        kintoWallet__ = 0xb0609586C6bD45A1e941b1b784F18d77221d8835;
         kintoWalletSigner__ = 0x1dBDF0936dF26Ba3D7e4bAA6297da9FE2d2428c2;
         _siblingSlug1 = uint32(_c++);
         _siblingSlug2 = uint32(_c++);
@@ -213,6 +214,8 @@ contract TestKintoHook is Test {
         deal(address(_token), sender, dealAmount);
         deal(sender, _fees);
 
+        assertEq(kintoHook__.withdrawalAmount(), 0, "withdrawalAmount sus");
+
         vm.startPrank(controller__);
 
         vm.expectRevert(
@@ -241,6 +244,8 @@ contract TestKintoHook is Test {
 
         deal(address(_token), sender, dealAmount);
         deal(sender, _fees);
+
+        assertEq(kintoHook__.withdrawalAmount(), 0, "withdrawalAmount sus");
 
         vm.startPrank(controller__);
 
@@ -274,6 +279,45 @@ contract TestKintoHook is Test {
         deal(address(_token), sender, dealAmount);
         deal(sender, _fees);
 
+        assertEq(kintoHook__.withdrawalAmount(), 0, "withdrawalAmount sus");
+
+        vm.startPrank(controller__);
+
+        kintoHook__.srcPreHookCall(
+            SrcPreHookCallParams(
+                _connector1,
+                address(sender),
+                TransferInfo(receiver, withdrawAmount, bytes(""))
+            )
+        );
+        vm.stopPrank();
+    }
+
+    function testsrcPreHookCallWithdrawalAmountGreaterThanZero() external {
+        _setLimits();
+
+        uint256 withdrawAmount = 10 ether;
+        uint256 dealAmount = 10 ether;
+        address sender = kintoWallet__;
+        address receiver = kintoWalletSigner__;
+
+        deal(address(_token), sender, dealAmount);
+        deal(sender, _fees);
+
+        // set withdrawalAmount to withdrawAmount
+        vm.store(
+            address(kintoHook__),
+            bytes32(uint256(9)),
+            bytes32(uint256(withdrawAmount))
+        );
+        assertEq(
+            kintoHook__.withdrawalAmount(),
+            withdrawAmount,
+            "withdrawalAmount sus"
+        );
+
+        // srcPreHookCall should now skip Kinto checks because even though the sender is not KYC'd
+        // the withdrawalAmount is > 0
         vm.startPrank(controller__);
 
         kintoHook__.srcPreHookCall(
@@ -438,9 +482,8 @@ contract TestKintoHook is Test {
         address sender = kintoWalletSigner__; // original sender from vault chain
         address receiver = address(0xfede);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(KintoHook.InvalidReceiver.selector, receiver)
-        );
+        assertEq(kintoHook__.withdrawalAmount(), 0);
+
         vm.startPrank(controller__);
         (
             bytes memory postHookData,
@@ -452,6 +495,16 @@ contract TestKintoHook is Test {
                     TransferInfo(receiver, depositAmount, abi.encode(sender))
                 )
             );
+
+        // should save the amount on withdrawalAmount
+        assertEq(
+            kintoHook__.withdrawalAmount(),
+            depositAmount,
+            "withdrawalAmount sus"
+        );
+
+        // should set the transferInfo amount to 0
+        assertEq(transferInfo.amount, 0, "depositAmount sus");
     }
 
     function testdstPreHookCallReceiverNotKYCd() external {
@@ -460,11 +513,12 @@ contract TestKintoHook is Test {
         address sender = kintoWalletSigner__; // original sender from vault chain
         address receiver = kintoWallet__;
 
+        assertEq(kintoHook__.withdrawalAmount(), 0, "withdrawalAmount sus");
+
         // revoke KYC to receiver
         vm.prank(kintoWalletSigner__);
         KintoID(kintoId__).addSanction(kintoWalletSigner__, 1);
 
-        vm.expectRevert(KintoHook.KYCRequired.selector);
         vm.startPrank(controller__);
         (
             bytes memory postHookData,
@@ -476,6 +530,16 @@ contract TestKintoHook is Test {
                     TransferInfo(receiver, depositAmount, abi.encode(sender))
                 )
             );
+
+        // should save the amount on withdrawalAmount
+        assertEq(
+            kintoHook__.withdrawalAmount(),
+            depositAmount,
+            "withdrawalAmount sus"
+        );
+
+        // should set the transferInfo amount to 0
+        assertEq(transferInfo.amount, 0, "depositAmount sus");
     }
 
     function testdstPreHookCallSenderNotAllowed() external {
@@ -484,9 +548,8 @@ contract TestKintoHook is Test {
         address sender = address(0xfede); // original sender from vault chain
         address receiver = kintoWallet__;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(KintoHook.SenderNotAllowed.selector, sender)
-        );
+        assertEq(kintoHook__.withdrawalAmount(), 0);
+
         vm.startPrank(controller__);
         (
             bytes memory postHookData,
@@ -498,6 +561,16 @@ contract TestKintoHook is Test {
                     TransferInfo(receiver, depositAmount, abi.encode(sender))
                 )
             );
+
+        // should save the amount on withdrawalAmount
+        assertEq(
+            kintoHook__.withdrawalAmount(),
+            depositAmount,
+            "withdrawalAmount sus"
+        );
+
+        // should set the transferInfo amount to 0
+        assertEq(transferInfo.amount, 0, "depositAmount sus");
     }
 
     function testdstPreHookCallCallSenderIsKintoWalletSigner() external {
@@ -505,6 +578,8 @@ contract TestKintoHook is Test {
         uint256 depositAmount = 2 ether;
         address sender = kintoWalletSigner__; // original sender from vault chain
         address receiver = kintoWallet__;
+
+        assertEq(kintoHook__.withdrawalAmount(), 0);
 
         vm.startPrank(controller__);
         (
@@ -548,6 +623,48 @@ contract TestKintoHook is Test {
     }
 
     ////// FINISH: KintoHook:dstPreHookCall tests //////
+
+    ////// START: KintoHook:dstPostHookCall tests //////
+
+    function testdstPostHookCallWithdrawalAmountGreaterThanZero() external {
+        _setLimits();
+        uint256 depositAmount = 2 ether;
+        address sender = address(0xfede); // original sender from vault chain
+        address receiver = kintoWallet__;
+
+        // set withdrawalAmount to depositAmount
+        vm.store(
+            address(kintoHook__),
+            bytes32(uint256(9)),
+            bytes32(uint256(depositAmount))
+        );
+
+        // mock getMinFees
+        vm.mockCall(
+            controller__,
+            abi.encodeWithSelector(Base.getMinFees.selector),
+            abi.encode(0) // zero fees
+        );
+
+        vm.startPrank(controller__);
+
+        // call dstPostHookCall
+        CacheData memory cacheData = kintoHook__.dstPostHookCall(
+            DstPostHookCallParams(
+                _connector1,
+                _messageId,
+                bytes(""),
+                bytes(""),
+                TransferInfo(receiver, depositAmount, abi.encode(sender))
+            )
+        );
+
+        // asert cacheData has the correct values
+        assertEq(cacheData.identifierCache, bytes(""), "identifierCache sus");
+        assertEq(cacheData.connectorCache, abi.encode(0), "connectorCache sus");
+    }
+
+    ////// FINISH: KintoHook:dstPostHookCall tests //////
 
     function testFullConsumeDstCall() external {
         _setLimits();

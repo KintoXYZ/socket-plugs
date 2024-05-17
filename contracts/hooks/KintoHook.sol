@@ -26,7 +26,7 @@ contract KintoHook is LimitHook {
     IKintoFactory public immutable kintoFactory;
 
     // if withdrawalAmount > 0, will trigger a withdrawal back to the vault chain
-    uint256 withdrawalAmount;
+    uint256 public withdrawalAmount;
 
     error InvalidSender(address sender);
     error ReceiverNotAllowed(address receiver);
