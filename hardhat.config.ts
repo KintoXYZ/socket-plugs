@@ -68,6 +68,7 @@ const liveNetworks = [
   HardhatChainName.REYA_CRONOS,
   HardhatChainName.REYA,
   HardhatChainName.KINTO,
+  HardhatChainName.KINTO_DEVNET,
 ];
 
 let hardhatNetworkDetails = {};
@@ -103,6 +104,7 @@ const config: HardhatUserConfig = {
       "lyra-testnet": "none",
       reya_cronos: "none",
       reya: "none",
+      kinto_devnet: "none",
       kinto: "none",
     },
     customChains: [
@@ -192,6 +194,15 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://explorer.reya.network/api",
           browserURL: "https://explorer.reya.network/",
+        },
+      },
+      {
+        network: "kinto_devnet",
+        chainId:
+          ChainSlugToId[hardhatChainNameToSlug[HardhatChainName.KINTO_DEVNET]],
+        urls: {
+          apiURL: "https://kinto-upgrade-dev-2.explorer.caldera.xyz/api",
+          browserURL: "https://kinto-upgrade-dev-2.explorer.caldera.xyz",
         },
       },
       {

@@ -61,8 +61,10 @@ export const ExistingTokenAddresses: {
     [Tokens.ETH]: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
   },
   [ChainSlug.ARBITRUM_SEPOLIA]: {
-    [Tokens.USDC]: "0x8537307810fC40F4073A12a38554D4Ff78EfFf41",
-    [Tokens.WETH]: "0x565810cbfa3Cf1390963E5aFa2fB953795686339",
+    // [Tokens.USDC]: "0x8537307810fC40F4073A12a38554D4Ff78EfFf41",
+    // [Tokens.WETH]: "0x565810cbfa3Cf1390963E5aFa2fB953795686339",
+    [Tokens.DAI]: "0x7Aacdc0e699d56B285C3913453C515A20B1263b8",
+    [Tokens.USDe]: "0x05de007af47051C09e1787AEBE9a8886dF2492b9",
   },
   [ChainSlug.SEPOLIA]: {
     [Tokens.USDC]: "0x565810cbfa3Cf1390963E5aFa2fB953795686339",
@@ -74,5 +76,9 @@ export const ExistingTokenAddresses: {
   [ChainSlug.OPTIMISM_SEPOLIA]: {
     [Tokens.USDC]: "0x6D290609b3F5F02D52F28d97C75a443ED8564cBf",
     [Tokens.WETH]: "0x2b42AFFD4b7C14d9B7C2579229495c052672Ccd3",
+  },
+  [ChainSlug.KINTO_DEVNET]: {
+    [Tokens.DAI]: "0xa27Bd4AD7822614F44aD05703C80887a990F78Bf",
+    [Tokens.USDe]: "0x05De000257248be60754cF2B388B6d2687106744",
   },
 };
