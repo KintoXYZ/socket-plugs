@@ -1,0 +1,28 @@
+{
+  "412346": {
+    "DAI": {
+      "isAppChain": true,
+      "MintableToken": "0xa27Bd4AD7822614F44aD05703C80887a990F78Bf",
+      "Controller": "0xA2d9bFb25b804fA8189c42756b0086BF942604A1",
+      "KintoHook": "0x1f6AcB9F9a61f68E01C71506F9c83a62Aa2aA944",
+      "connectors": {
+        "421614": {
+          "FAST": "0x7bF48A72145e7110696638254aceF47E477AB3f4"
+        }
+      }
+    }
+  },
+  "421614": {
+    "DAI": {
+      "isAppChain": false,
+      "NonMintableToken": "0x7Aacdc0e699d56B285C3913453C515A20B1263b8",
+      "Vault": "0xE6243E002ee0944e16c46AD931f8eA2d3ECB418D",
+      "SenderHook": "0xFEf78C3f6E65beF817386ab1a81bB365452159C3",
+      "connectors": {
+        "412346": {
+          "FAST": "0x3A79F26E1FF4816FaF2ac81d6a30bFA6813929FE"
+        }
+      }
+    }
+  }
+}
