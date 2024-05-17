@@ -56,7 +56,6 @@ contract TestKintoHook is Test {
     bytes32 constant LIMIT_UPDATER_ROLE = keccak256("LIMIT_UPDATER_ROLE");
 
     function setUp() external {
-        
         uint256 kintoFork = vm.createSelectFork("kinto_devnet");
 
         vm.startPrank(_admin);
@@ -70,7 +69,13 @@ contract TestKintoHook is Test {
         _siblingSlug1 = uint32(_c++);
         _siblingSlug2 = uint32(_c++);
 
-        kintoHook__ = new KintoHook(_admin, controller__, false, kintoId__, kintoFactory__);
+        kintoHook__ = new KintoHook(
+            _admin,
+            controller__,
+            false,
+            kintoId__,
+            kintoFactory__
+        );
         _token = new MintableToken("Moon", "MOON", 18);
         _token.mint(_admin, _initialSupply);
         _token.mint(_raju, _rajuInitialBal);
@@ -156,7 +161,9 @@ contract TestKintoHook is Test {
 
         vm.startPrank(controller__);
 
-        vm.expectRevert(abi.encodeWithSelector(KintoHook.InvalidSender.selector, sender));
+        vm.expectRevert(
+            abi.encodeWithSelector(KintoHook.InvalidSender.selector, sender)
+        );
         kintoHook__.srcPreHookCall(
             SrcPreHookCallParams(
                 _connector1,
@@ -208,7 +215,12 @@ contract TestKintoHook is Test {
 
         vm.startPrank(controller__);
 
-        vm.expectRevert(abi.encodeWithSelector(KintoHook.ReceiverNotAllowed.selector, receiver));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                KintoHook.ReceiverNotAllowed.selector,
+                receiver
+            )
+        );
         kintoHook__.srcPreHookCall(
             SrcPreHookCallParams(
                 _connector1,
@@ -275,7 +287,6 @@ contract TestKintoHook is Test {
     }
 
     ////// FINISH: KintoHook:srcPreHook tests //////
-
 
     function testsrcPreHookCallSender() external {
         _setLimits();
@@ -427,7 +438,9 @@ contract TestKintoHook is Test {
         address sender = kintoWalletSigner__; // original sender from vault chain
         address receiver = address(0xfede);
 
-        vm.expectRevert(abi.encodeWithSelector(KintoHook.InvalidReceiver.selector, receiver));
+        vm.expectRevert(
+            abi.encodeWithSelector(KintoHook.InvalidReceiver.selector, receiver)
+        );
         vm.startPrank(controller__);
         (
             bytes memory postHookData,
@@ -471,7 +484,9 @@ contract TestKintoHook is Test {
         address sender = address(0xfede); // original sender from vault chain
         address receiver = kintoWallet__;
 
-        vm.expectRevert(abi.encodeWithSelector(KintoHook.SenderNotAllowed.selector, sender));
+        vm.expectRevert(
+            abi.encodeWithSelector(KintoHook.SenderNotAllowed.selector, sender)
+        );
         vm.startPrank(controller__);
         (
             bytes memory postHookData,

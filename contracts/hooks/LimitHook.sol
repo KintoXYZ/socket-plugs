@@ -40,7 +40,7 @@ contract LimitHook is LimitPlugin, ConnectorPoolPlugin {
 
     function srcPostHookCall(
         SrcPostHookCallParams memory params_
-    ) public view virtual isVaultOrController returns (TransferInfo memory) {
+    ) public virtual isVaultOrController returns (TransferInfo memory) {
         return params_.transferInfo;
     }
 

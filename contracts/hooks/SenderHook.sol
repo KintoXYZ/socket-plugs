@@ -10,7 +10,7 @@ import "./LimitHook.sol";
 contract SenderHook is LimitHook {
     /**
      * @notice meant to be deployed only on vault chains (all except Kinto).
-     * Overrides `srcPreHookCall` to pass the `msg.sender` so that it can be used 
+     * Overrides `srcPreHookCall` to pass the `msg.sender` so that it can be used
      * in the `dstPreHookCall` on Kinto chain.
      * @param owner_ Owner of this contract.
      * @param controller_ Controller of this contract.
@@ -39,7 +39,7 @@ contract SenderHook is LimitHook {
 
     function srcPostHookCall(
         SrcPostHookCallParams memory params_
-    ) public view override isVaultOrController returns (TransferInfo memory) {
+    ) public override isVaultOrController returns (TransferInfo memory) {
         return super.srcPostHookCall(params_);
     }
 

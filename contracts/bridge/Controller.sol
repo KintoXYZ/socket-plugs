@@ -27,7 +27,7 @@ contract Controller is Base {
         address connector_,
         bytes calldata execPayload_,
         bytes calldata options_
-    ) external payable nonReentrant {
+    ) external payable {
         (
             TransferInfo memory transferInfo,
             bytes memory postHookData
