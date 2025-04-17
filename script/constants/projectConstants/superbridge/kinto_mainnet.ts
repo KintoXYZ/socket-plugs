@@ -386,13 +386,13 @@ export const pc: ProjectConstants = {
         limitsAndPoolId: {
           [ChainSlug.MAINNET]: {
             [IntegrationTypes.fast]: {
-              receivingLimit: "1135",
+              receivingLimit: "2000",
               sendingLimit: "11350",
             },
           },
           [ChainSlug.KINTO]: {
             [IntegrationTypes.fast]: {
-              sendingLimit: "1135",
+              sendingLimit: "2000",
               receivingLimit: "11350",
             },
           },
